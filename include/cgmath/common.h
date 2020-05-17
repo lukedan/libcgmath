@@ -11,7 +11,7 @@ namespace math {
 	/// Wrapper around a boolean that indicates whether to break a loop.
 	struct break_loop {
 		/// Explicit constructor.
-		explicit break_loop(bool bk) : do_break(bk) {
+		constexpr explicit break_loop(bool bk) : do_break(bk) {
 		}
 
 		bool do_break = false; ///< Whether to break.
@@ -21,13 +21,13 @@ namespace math {
 	namespace arr {
 		namespace _details {
 			/// End of recursion.
-			template <typename Callback, typename ...Args> void _for_each_impl(Callback&&, Args&&...) {
+			template <typename Callback, typename ...Args> constexpr void _for_each_impl(Callback&&, Args&&...) {
 			}
 			/// Implementation of \ref for_each().
 			template <
 				std::size_t FirstId, std::size_t ...OtherIds, typename Callback, typename ...Args
-			> void _for_each_impl(Callback &&cb, Args &&...args) {
-				using return_type = std::invoke_result_t<Callback&&, Args&&...>;
+			> constexpr void _for_each_impl(Callback &&cb, Args &&...args) {
+				using return_type = std::invoke_result_t<Callback&&, decltype(args[FirstId])...>;
 				if constexpr (std::is_same_v<return_type, break_loop>) {
 					if (std::forward<Callback>(cb)(args[FirstId]...).do_break) {
 						return;
@@ -39,14 +39,16 @@ namespace math {
 			}
 
 			/// Wrapper around \ref _for_each_impl().
-			template <typename Callback, typename ...Args, std::size_t ...Indices> void _for_each_impl_wrapper(
+			template <
+				typename Callback, typename ...Args, std::size_t ...Indices
+			> constexpr void _for_each_impl_wrapper(
 				std::index_sequence<Indices...>, Callback &&cb, Args &&...args
 			) {
 				_for_each_impl<Indices...>(std::forward<Callback>(cb), std::forward<Args>(args)...);
 			}
 		}
 		/// Calls the callback function using each element in each input array.
-		template <typename Callback, typename FirstArg, typename ...OtherArgs> void for_each(
+		template <typename Callback, typename FirstArg, typename ...OtherArgs> constexpr void for_each(
 			Callback &&cb, FirstArg &&first, OtherArgs &&...others
 		) {
 			static_assert(

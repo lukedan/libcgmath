@@ -58,7 +58,7 @@ namespace math {
 	/// Memberwise addition.
 	template <
 		typename Lhs, typename Rhs
-	> _details::enable_if_nonvoid_t<
+	> [[nodiscard]] constexpr _details::enable_if_nonvoid_t<
 		typename arithmetic_traits::memberwise_addition<Lhs, Rhs>::result_type
 	> operator+(const Lhs &lhs, const Rhs &rhs) {
 		typename arithmetic_traits::memberwise_addition<Lhs, Rhs>::result_type result;
@@ -71,7 +71,7 @@ namespace math {
 		return result;
 	}
 	/// In-place memberwise addition.
-	template <typename Lhs, typename Rhs> std::enable_if_t<
+	template <typename Lhs, typename Rhs> constexpr std::enable_if_t<
 		std::is_same_v<typename arithmetic_traits::memberwise_addition<Lhs, Rhs>::result_type, Lhs>, Lhs&
 	> operator+=(Lhs &lhs, const Rhs &rhs) {
 		arr::for_each(
@@ -84,7 +84,7 @@ namespace math {
 	}
 
 	/// Memberwise subtraction.
-	template <typename Lhs, typename Rhs> _details::enable_if_nonvoid_t<
+	template <typename Lhs, typename Rhs> [[nodiscard]] constexpr _details::enable_if_nonvoid_t<
 		typename arithmetic_traits::memberwise_subtraction<Lhs, Rhs>::result_type
 	> operator-(const Lhs &lhs, const Rhs &rhs) {
 		typename arithmetic_traits::memberwise_subtraction<Lhs, Rhs>::result_type result;
@@ -97,7 +97,7 @@ namespace math {
 		return result;
 	}
 	/// In-place memberwise subtraction.
-	template <typename Lhs, typename Rhs> std::enable_if_t<
+	template <typename Lhs, typename Rhs> constexpr std::enable_if_t<
 		std::is_same_v<typename arithmetic_traits::memberwise_subtraction<Lhs, Rhs>::result_type, Lhs>, Lhs&
 	> operator-=(Lhs &lhs, const Rhs &rhs) {
 		arr::for_each(
@@ -109,8 +109,22 @@ namespace math {
 		return lhs;
 	}
 
+	/// Negation.
+	template <typename Val> [[nodiscard]] constexpr _details::enable_if_nonvoid_t<
+		typename arithmetic_traits::negation<Val>::result_type
+	> operator-(const Val &val) {
+		typename arithmetic_traits::negation<Val>::result_type result;
+		arr::for_each(
+			[](auto &l, const auto &r) {
+				l -= r;
+			},
+			result, val
+				);
+		return result;
+	}
+
 	/// Scalar multiplication.
-	template <typename Lhs, typename Rhs> _details::enable_if_nonvoid_t<
+	template <typename Lhs, typename Rhs> [[nodiscard]] constexpr _details::enable_if_nonvoid_t<
 		typename arithmetic_traits::scalar_multiplication<Lhs, Rhs>::result_type
 	> operator*(const Lhs &lhs, const Rhs &rhs) {
 		typename arithmetic_traits::scalar_multiplication<Lhs, Rhs>::result_type result;
@@ -134,7 +148,7 @@ namespace math {
 		return result;
 	}
 	/// In-place scalar multiplication.
-	template <typename Lhs, typename Rhs> std::enable_if_t<
+	template <typename Lhs, typename Rhs> constexpr std::enable_if_t<
 		std::is_same_v<typename arithmetic_traits::scalar_multiplication<Lhs, Rhs>::result_type, Lhs> &&
 		std::is_same_v<typename arithmetic_traits::scalar_multiplication<Lhs, Rhs>::scalar_side, right_hand_side>,
 		Lhs&
@@ -149,7 +163,7 @@ namespace math {
 	}
 
 	/// Scalar multiplication.
-	template <typename Lhs, typename Rhs> _details::enable_if_nonvoid_t<
+	template <typename Lhs, typename Rhs> [[nodiscard]] constexpr _details::enable_if_nonvoid_t<
 		typename arithmetic_traits::scalar_division<Lhs, Rhs>::result_type
 	> operator/(const Lhs &lhs, const Rhs &rhs) {
 		typename arithmetic_traits::scalar_division<Lhs, Rhs>::result_type result;
@@ -173,7 +187,7 @@ namespace math {
 		return result;
 	}
 	/// In-place scalar multiplication.
-	template <typename Lhs, typename Rhs> std::enable_if_t<
+	template <typename Lhs, typename Rhs> constexpr std::enable_if_t<
 		std::is_same_v<typename arithmetic_traits::scalar_division<Lhs, Rhs>::result_type, Lhs> &&
 		std::is_same_v<typename arithmetic_traits::scalar_division<Lhs, Rhs>::scalar_side, right_hand_side>,
 		Lhs&
@@ -189,7 +203,7 @@ namespace math {
 
 
 	/// Equality.
-	template <typename Lhs, typename Rhs> std::enable_if_t<
+	template <typename Lhs, typename Rhs> [[nodiscard]] constexpr std::enable_if_t<
 		arithmetic_traits::equality<Lhs, Rhs>::enabled, bool
 	> operator==(const Lhs &lhs, const Rhs &rhs) {
 		bool result = true;
@@ -206,7 +220,7 @@ namespace math {
 		return result;
 	}
 	/// Inequality.
-	template <typename Lhs, typename Rhs> std::enable_if_t<
+	template <typename Lhs, typename Rhs> [[nodiscard]] constexpr std::enable_if_t<
 		arithmetic_traits::equality<Lhs, Rhs>::enabled, bool
 	> operator!=(const Lhs &lhs, const Rhs &rhs) {
 		return !(lhs == rhs);

@@ -15,25 +15,32 @@ namespace math::impls {
 		/// End of recursion.
 		template <
 			template <typename> typename Mod, typename Current
-		> Mod<Derived> *_cast_sequence(Mod<Current> *ptr) const {
-			return static_cast<Mod<Derived>*>(ptr);
+		> constexpr Mod<Derived> &_cast_sequence(Mod<Current> &ptr) const {
+			return static_cast<Mod<Derived>&>(ptr);
 		}
 		/// Performs \p static_cast along a sequence of types.
 		template <
 			template <typename> typename Mod, typename Current,
 			typename Mid, typename ...Others
-		> Mod<Derived> *_cast_sequence(Mod<Current> *ptr) const {
+		> constexpr Mod<Derived> &_cast_sequence(Mod<Current> &ptr) const {
 			static_assert(std::is_base_of_v<Current, Mid>, "Incorrect base type");
-			return _cast_sequence<Mod, Mid, Others...>(static_cast<Mod<Mid>*>(ptr));
+			return _cast_sequence<Mod, Mid, Others...>(static_cast<Mod<Mid>&>(ptr));
 		}
-	protected:
+	public:
 		/// Non-const \p this.
-		Derived *_this() {
-			return _cast_sequence<_identity, this_ptr, CastSeq...>(this);
+		constexpr Derived &get() {
+			return _cast_sequence<_identity, this_ptr, CastSeq...>(*this);
 		}
 		/// Const \p this.
-		const Derived *_this() const {
-			return _cast_sequence<std::add_const_t, this_ptr, CastSeq...>(this);
+		constexpr const Derived &get() const {
+			return _cast_sequence<std::add_const_t, this_ptr, CastSeq...>(*this);
 		}
 	};
+
+	/// Used to retrieve \p T::value_type.
+	template <typename T> struct array_traits;
+	/// Shorthand to \ref array_traits::dimension.
+	template <typename T> constexpr inline std::size_t array_dimension_t = array_traits<T>::dimension;
+	/// Shorthand for \ref get_value_type::type.
+	template <typename T> using array_value_type_t = typename array_traits<T>::value_type;
 }

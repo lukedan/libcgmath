@@ -15,4 +15,8 @@ add_executable(unit_test)
 
 target_sources(unit_test PRIVATE test/unit.cpp)
 target_link_libraries(unit_test cgmath GTest::GTest GTest::Main)
+set_target_properties(unit_test PROPERTIES CXX_EXTENSIONS OFF)
+if(MSVC)
+	target_compile_options(unit_test PRIVATE /permissive-)
+endif()
 gtest_discover_tests(unit_test)
